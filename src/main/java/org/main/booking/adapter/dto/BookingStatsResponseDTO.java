@@ -5,6 +5,7 @@ import org.main.booking.application.BookingStatsResponse;
 
 import java.math.BigDecimal;
 
+
 @Getter
 public class BookingStatsResponseDTO {
     private BigDecimal avgNight;
