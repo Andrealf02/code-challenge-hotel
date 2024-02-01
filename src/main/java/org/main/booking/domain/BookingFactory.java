@@ -13,6 +13,5 @@ public class BookingFactory {
             booking.setMargin(margin);
             return booking;
         }
-
 }
 

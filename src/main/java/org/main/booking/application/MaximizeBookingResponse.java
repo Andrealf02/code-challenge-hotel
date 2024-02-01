@@ -10,8 +10,13 @@ public class MaximizeBookingResponse {
     private BigDecimal minNight;
     private BigDecimal maxNight;
 
-    public MaximizeBookingResponse(List<String> requestIds, BigDecimal totalProfit, BigDecimal avgNight,
-                                   BigDecimal minNight, BigDecimal maxNight) {
+    public MaximizeBookingResponse(
+            List<String> requestIds,
+            BigDecimal totalProfit,
+            BigDecimal avgNight,
+            BigDecimal minNight,
+            BigDecimal maxNight
+    ) {
         this.requestIds = requestIds;
         this.totalProfit = totalProfit;
         this.avgNight = avgNight;

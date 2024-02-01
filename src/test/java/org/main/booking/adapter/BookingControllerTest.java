@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.Collections;
 import java.util.List;
 
@@ -44,7 +45,7 @@ public class BookingControllerTest {
 
         Booking savedBooking = allBookings.get(0);
         assertEquals("test_request", savedBooking.getRequestId());
-        assertEquals(LocalDate.parse("2022-01-01"), savedBooking.getCheckIn());
+        assertEquals("2022-01-01", savedBooking.getCheckIn().format(DateTimeFormatter.ISO_LOCAL_DATE));
         assertEquals(3, savedBooking.getNights());
         assertEquals(new BigDecimal("100"), savedBooking.getSellingRate());
         assertEquals(15, savedBooking.getMargin());
@@ -53,10 +54,14 @@ public class BookingControllerTest {
     private Booking createTestBooking() {
         Booking booking = new Booking();
         booking.setRequestId("test_request");
-        booking.setCheckIn(LocalDate.parse("2022-01-01"));
+        booking.setCheckIn(parseDate("2022-01-01"));
         booking.setNights(3);
         booking.setSellingRate(new BigDecimal("100"));
         booking.setMargin(15);
         return booking;
+    }
+
+    private LocalDate parseDate(String date) {
+        return LocalDate.parse(date, DateTimeFormatter.ISO_LOCAL_DATE);
     }
 }

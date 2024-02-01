@@ -13,7 +13,10 @@ import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.List;
+
 @RestController
 @RequestMapping("/bookings")
 public class BookingController {
@@ -21,6 +24,12 @@ public class BookingController {
 
     public BookingController(BookingService bookingService) {
         this.bookingService = bookingService;
+    }
+
+    @GetMapping
+    public ResponseEntity<List<Booking>> getAllBookings() {
+        List<Booking> allBookings = bookingService.getAllBookings();
+        return ResponseEntity.ok(allBookings);
     }
 
     @PostMapping("/stats")
@@ -36,13 +45,13 @@ public class BookingController {
     }
 
 
-
     @PostMapping("/maximize")
     public ResponseEntity<MaximizeBookingResponseDTO> maximizeProfits(@RequestBody List<Booking> bookingRequests) {
         MaximizeBookingResponse maximizeResponse = bookingService.maximizeProfits(bookingRequests);
         MaximizeBookingResponseDTO maximizeResponseDTO = new MaximizeBookingResponseDTO(maximizeResponse);
         return ResponseEntity.ok(maximizeResponseDTO);
     }
+
 
     @PostMapping("/bookings")
     public ResponseEntity<List<Booking>> handleBookingRequest(@RequestBody List<Booking> bookingRequests) {
@@ -53,17 +62,18 @@ public class BookingController {
         return ResponseEntity.ok(savedBookings);
     }
 
-    @GetMapping
-    public ResponseEntity<List<Booking>> getAllBookings() {
-        List<Booking> allBookings = bookingService.getAllBookings();
-        return ResponseEntity.ok(allBookings);
+    @PostMapping("/create-and-save-booking")
+    public ResponseEntity<String> createAndSaveBooking() {
+        bookingService.createAndSaveBooking("someId", LocalDate.now(), 5, BigDecimal.valueOf(100), 10);
+        return ResponseEntity.ok("Booking created and saved successfully");
     }
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<String> handleException(Exception e) {
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Internal Server Error");
     }
-   @ExceptionHandler(MethodArgumentNotValidException.class)
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<String> handleValidationException(MethodArgumentNotValidException ex) {
         BindingResult result = ex.getBindingResult();
         List<FieldError> fieldErrors = result.getFieldErrors();

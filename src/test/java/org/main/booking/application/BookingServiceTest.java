@@ -1,10 +1,11 @@
 package org.main.booking.application;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.main.booking.domain.Booking;
 import org.main.booking.domain.BookingRepository;
-import org.mockito.Mockito;
-import org.testng.annotations.Test;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -17,57 +18,52 @@ import static org.mockito.Mockito.*;
 
 public class BookingServiceTest {
 
+    @Mock
     private BookingRepository bookingRepository;
+
+    @Mock
     private BookingStatsService bookingStatsService;
+
+    @Mock
     private BookingMaximizationService bookingMaximizationService;
+
     private BookingService bookingService;
 
     @BeforeEach
     void setUp() {
-        bookingRepository = Mockito.mock(BookingRepository.class);
-        bookingStatsService = Mockito.mock(BookingStatsService.class);
-        bookingMaximizationService = Mockito.mock(BookingMaximizationService.class);
-
-        bookingService = new BookingService(
-                bookingRepository,
-                bookingStatsService,
-                bookingMaximizationService
-        );
+        MockitoAnnotations.openMocks(this);
+        bookingService = new BookingService(bookingRepository, bookingStatsService, bookingMaximizationService);
     }
 
     @Test
     void saveBooking_ShouldAddBookingToRepository() {
-        // Arrange
         Booking booking = createTestBooking();
 
-        // Act
         bookingService.saveBooking(booking);
 
-        // Assert
         verify(bookingRepository, times(1)).save(booking);
     }
 
     @Test
     void getAllBookings_ShouldReturnAllBookingsFromRepository() {
-        // Arrange
-        Booking booking1 = createTestBooking();
-        Booking booking2 = createTestBooking();
+        Booking booking1 = createTestBooking("1");
+        Booking booking2 = createTestBooking("2");
         when(bookingRepository.findAll()).thenReturn(Arrays.asList(booking1, booking2));
 
-        // Act
         List<Booking> allBookings = bookingService.getAllBookings();
 
-        // Assert
         assertEquals(2, allBookings.size());
         assertTrue(allBookings.contains(booking1));
         assertTrue(allBookings.contains(booking2));
     }
 
-    // Other test methods...
-
     private Booking createTestBooking() {
+        return createTestBooking("");
+    }
+
+    private Booking createTestBooking(String requestIdSuffix) {
         Booking booking = new Booking();
-        booking.setRequestId("test_request");
+        booking.setRequestId("test_request_" + requestIdSuffix);
         booking.setCheckIn(LocalDate.parse("2022-01-01"));
         booking.setNights(3);
         booking.setSellingRate(new BigDecimal("100"));
