@@ -6,6 +6,9 @@ import org.main.booking.application.MaximizeBookingResponse;
 import org.main.booking.domain.Booking;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -47,5 +50,15 @@ public class BookingController {
     @ExceptionHandler(Exception.class)
     public ResponseEntity<String> handleException(Exception e) {
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Internal Server Error");
+    }
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<String> handleValidationException(MethodArgumentNotValidException ex) {
+        BindingResult result = ex.getBindingResult();
+        List<FieldError> fieldErrors = result.getFieldErrors();
+        StringBuilder errorMessage = new StringBuilder("Validation error(s): ");
+        for (FieldError fieldError : fieldErrors) {
+            errorMessage.append(fieldError.getDefaultMessage()).append("; ");
+        }
+        return ResponseEntity.badRequest().body(errorMessage.toString());
     }
 }

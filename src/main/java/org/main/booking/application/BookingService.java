@@ -51,16 +51,17 @@ public class BookingService {
 
         BigDecimal avgNight = profitInfo.totalProfit.divide(BigDecimal.valueOf(validBookings.size()), 2, BigDecimal.ROUND_HALF_UP);
 
-        BigDecimal minNight = BigDecimal.valueOf(Double.MAX_VALUE);
-        BigDecimal maxNight = BigDecimal.valueOf(Double.MIN_VALUE);
-
-        for (Booking booking : validBookings) {
-            BigDecimal profitPerNight = calculateProfitPerNight(booking);
-            minNight = minNight.min(profitPerNight);
-            maxNight = maxNight.max(profitPerNight);
-        }
+        BigDecimal minNight = calculateMinOrMaxNight(validBookings, true);
+        BigDecimal maxNight = calculateMinOrMaxNight(validBookings, false);
 
         return new MaximizeBookingResponse(profitInfo.requestIds, profitInfo.totalProfit, avgNight, minNight, maxNight);
+    }
+
+    private BigDecimal calculateMinOrMaxNight(List<Booking> validBookings, boolean isMin) {
+        return validBookings.stream()
+                .map(this::calculateProfitPerNight)
+                .reduce(isMin ? BigDecimal.valueOf(Double.MAX_VALUE) : BigDecimal.valueOf(Double.MIN_VALUE),
+                        isMin ? BigDecimal::min : BigDecimal::max);
     }
 
     private ProfitInfo maximizeProfitsHelper(List<Booking> bookings, int index, int remainingNights) {
@@ -81,31 +82,42 @@ public class BookingService {
             includeCurrent.totalNights = currentBooking.getNights() + next.totalNights;
         }
 
-        if (includeCurrent.totalProfit.compareTo(excludeCurrent.totalProfit) > 0) {
-            return includeCurrent;
-        } else {
-            return excludeCurrent;
-        }
+        return includeCurrent.totalProfit.compareTo(excludeCurrent.totalProfit) > 0 ? includeCurrent : excludeCurrent;
     }
 
     private BigDecimal calculateProfitPerNight(Booking booking) {
-        return booking.getSellingRate().multiply(BigDecimal.valueOf(booking.getMargin()).divide(BigDecimal.valueOf(100)))
-                .divide(BigDecimal.valueOf(booking.getNights()), 2, BigDecimal.ROUND_HALF_UP);
+        BigDecimal marginFactor = BigDecimal
+                .valueOf(booking.getMargin())
+                .divide(BigDecimal.valueOf(100));
+
+        return booking.getSellingRate()
+                .multiply(marginFactor)
+                .divide(BigDecimal.valueOf(booking.getNights()),
+                        2,
+                        BigDecimal.ROUND_HALF_UP
+                );
     }
 
     private List<Booking> findNonOverlappingBookings(List<Booking> bookingRequests) {
-        List<Booking> nonOverlappingBookings = new ArrayList<>();
+        return bookingRequests.stream()
+                .sorted(Comparator
+                        .comparing(Booking::getCheckIn)
+                )
+                .reduce(new ArrayList<>(),
+                        this::accumulateNonOverlappingBookings,
+                        this::combineNonOverlappingBookings
+                );
+    }
 
-        bookingRequests.sort(Comparator.comparing(Booking::getCheckIn));
-
-        Booking lastBooking = null;
-        for (Booking currentBooking : bookingRequests) {
-            if (lastBooking == null || lastBooking.getCheckOut().isBefore(currentBooking.getCheckIn())) {
-                nonOverlappingBookings.add(currentBooking);
-                lastBooking = currentBooking;
-            }
+    private List<Booking> accumulateNonOverlappingBookings(List<Booking> accumulator, Booking currentBooking) {
+        if (accumulator.isEmpty() || accumulator.get(accumulator.size() - 1).getCheckOut().isBefore(currentBooking.getCheckIn())) {
+            accumulator.add(currentBooking);
         }
+        return accumulator;
+    }
 
-        return nonOverlappingBookings;
+    private List<Booking> combineNonOverlappingBookings(List<Booking> list1, List<Booking> list2) {
+        list1.addAll(list2);
+        return list1;
     }
 }

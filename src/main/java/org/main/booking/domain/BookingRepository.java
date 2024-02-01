@@ -1,5 +1,7 @@
 package org.main.booking.domain;
 
+import org.main.booking.exceptions.OverlappingBookingException;
+
 import java.util.ArrayList;
 import java.util.List;
 

@@ -50,5 +50,7 @@ public class Booking {
         this.margin = margin;
     }
 
-    public LocalDate getCheckOut() {return checkIn.plusDays(nights); }
+    public LocalDate getCheckOut() {
+        return checkIn.plusDays(nights);
+    }
 }

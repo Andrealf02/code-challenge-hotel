@@ -1,6 +1,5 @@
 package org.main.booking.application;
 
-import junit.framework.TestCase;
 import org.main.booking.domain.Booking;
 import org.testng.annotations.Test;
 
