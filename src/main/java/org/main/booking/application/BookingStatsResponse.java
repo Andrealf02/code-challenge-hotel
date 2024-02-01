@@ -1,10 +1,8 @@
 package org.main.booking.application;
 
 import lombok.Getter;
-import org.main.booking.domain.Booking;
 
 import java.math.BigDecimal;
-import java.util.List;
 
 @Getter
 public class BookingStatsResponse {

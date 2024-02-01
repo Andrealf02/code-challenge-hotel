@@ -25,10 +25,16 @@ public class BookingController {
 
     @PostMapping("/stats")
     public ResponseEntity<BookingStatsResponseDTO> calculateBookingStats(@RequestBody List<Booking> bookingRequests) {
+        if (bookingRequests == null || bookingRequests.isEmpty()) {
+            BookingStatsResponseDTO emptyStatsDTO = new BookingStatsResponseDTO(BookingStatsResponse.emptyStats());
+            return ResponseEntity.ok(emptyStatsDTO);
+        }
+
         BookingStatsResponse statsResponse = bookingService.calculateBookingStats(bookingRequests);
         BookingStatsResponseDTO statsResponseDTO = new BookingStatsResponseDTO(statsResponse);
         return ResponseEntity.ok(statsResponseDTO);
     }
+
 
 
     @PostMapping("/maximize")
@@ -57,7 +63,7 @@ public class BookingController {
     public ResponseEntity<String> handleException(Exception e) {
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Internal Server Error");
     }
-    @ExceptionHandler(MethodArgumentNotValidException.class)
+   @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<String> handleValidationException(MethodArgumentNotValidException ex) {
         BindingResult result = ex.getBindingResult();
         List<FieldError> fieldErrors = result.getFieldErrors();

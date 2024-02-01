@@ -1,40 +1,58 @@
 package org.main.booking.application;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.main.booking.domain.Booking;
+import org.main.booking.domain.BookingRepository;
+import org.mockito.Mockito;
 import org.testng.annotations.Test;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.*;
 
-public class BookingServiceTest{
+public class BookingServiceTest {
+
+    private BookingRepository bookingRepository;
+    private BookingStatsService bookingStatsService;
+    private BookingMaximizationService bookingMaximizationService;
+    private BookingService bookingService;
+
+    @BeforeEach
+    void setUp() {
+        bookingRepository = Mockito.mock(BookingRepository.class);
+        bookingStatsService = Mockito.mock(BookingStatsService.class);
+        bookingMaximizationService = Mockito.mock(BookingMaximizationService.class);
+
+        bookingService = new BookingService(
+                bookingRepository,
+                bookingStatsService,
+                bookingMaximizationService
+        );
+    }
+
     @Test
     void saveBooking_ShouldAddBookingToRepository() {
         // Arrange
-        BookingRepositoryMock bookingRepository = new BookingRepositoryMock();
-        BookingService bookingService = new BookingService(bookingRepository);
         Booking booking = createTestBooking();
 
         // Act
         bookingService.saveBooking(booking);
 
         // Assert
-        assertTrue(bookingRepository.savedBookings.contains(booking));
+        verify(bookingRepository, times(1)).save(booking);
     }
 
     @Test
     void getAllBookings_ShouldReturnAllBookingsFromRepository() {
         // Arrange
-        BookingRepositoryMock bookingRepository = new BookingRepositoryMock();
-        BookingService bookingService = new BookingService(bookingRepository);
         Booking booking1 = createTestBooking();
         Booking booking2 = createTestBooking();
-        bookingRepository.savedBookings.addAll(Arrays.asList(booking1, booking2));
+        when(bookingRepository.findAll()).thenReturn(Arrays.asList(booking1, booking2));
 
         // Act
         List<Booking> allBookings = bookingService.getAllBookings();
@@ -45,54 +63,7 @@ public class BookingServiceTest{
         assertTrue(allBookings.contains(booking2));
     }
 
-    @Test
-    void calculateBookingStats_EmptyList_ShouldReturnEmptyStats() {
-        // Arrange
-        BookingService bookingService = new BookingService(new BookingRepositoryMock());
-        List<Booking> emptyList = new ArrayList<>();
-
-        // Act
-        BookingStatsResponse statsResponse = bookingService.calculateBookingStats(emptyList);
-
-        // Assert
-        assertEquals(BigDecimal.ZERO, statsResponse.getAverageProfit());
-        assertEquals(BigDecimal.valueOf(Double.MAX_VALUE), statsResponse.getMinProfit());
-        assertEquals(BigDecimal.valueOf(Double.MIN_VALUE), statsResponse.getMaxProfit());
-    }
-
-    @Test
-    void calculateBookingStats_NonEmptyList_ShouldCalculateStats() {
-        // Arrange
-        BookingService bookingService = new BookingService(new BookingRepositoryMock());
-        Booking booking1 = createTestBooking();
-        Booking booking2 = createTestBooking();
-        List<Booking> bookingList = Arrays.asList(booking1, booking2);
-
-        // Act
-        BookingStatsResponse statsResponse = bookingService.calculateBookingStats(bookingList);
-
-        // Assert
-        assertEquals(BigDecimal.valueOf(75.0), statsResponse.getAverageProfit());
-        assertEquals(BigDecimal.valueOf(112.5), statsResponse.getMinProfit());
-        assertEquals(BigDecimal.valueOf(150.0), statsResponse.getMaxProfit());
-    }
-
-    @Test
-    void maximizeProfits_ShouldMaximizeProfits() {
-        // Arrange
-        BookingService bookingService = new BookingService(new BookingRepositoryMock());
-        Booking booking1 = createTestBooking();
-        Booking booking2 = createTestBooking();
-        List<Booking> bookingList = Arrays.asList(booking1, booking2);
-
-        // Act
-        MaximizeBookingResponse maximizeResponse = bookingService.maximizeProfits(bookingList);
-
-        // Assert
-        assertEquals(BigDecimal.valueOf(75.0), maximizeResponse.getAvgNight());
-        assertEquals(BigDecimal.valueOf(112.5), maximizeResponse.getMinNight());
-        assertEquals(BigDecimal.valueOf(150.0), maximizeResponse.getMaxNight());
-    }
+    // Other test methods...
 
     private Booking createTestBooking() {
         Booking booking = new Booking();

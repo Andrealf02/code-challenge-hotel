@@ -23,10 +23,14 @@ public class BookingService {
         this.bookingMaximizationService = bookingMaximizationService;
     }
 
+    public void createAndSaveBooking(String requestId, LocalDate checkIn, int nights, BigDecimal sellingRate, int margin) {
+        Booking booking = BookingFactory.createBooking(requestId, checkIn, nights, sellingRate, margin);
+        saveBooking(booking);
+    }
+
     public void saveBooking(Booking booking) {
         bookingRepository.save(booking);
     }
-
     public List<Booking> getAllBookings() {
         return bookingRepository.findAll();
     }
@@ -39,8 +43,4 @@ public class BookingService {
         return bookingMaximizationService.maximizeProfits(bookingRequests);
     }
 
-    public void createAndSaveBooking(String requestId, LocalDate checkIn, int nights, BigDecimal sellingRate, int margin) {
-        Booking booking = BookingFactory.createBooking(requestId, checkIn, nights, sellingRate, margin);
-        saveBooking(booking);
-    }
 }
