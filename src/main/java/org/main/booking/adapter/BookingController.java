@@ -1,15 +1,16 @@
 package org.main.booking.adapter;
 
 import org.main.booking.application.BookingService;
+import org.main.booking.application.BookingStatsResponse;
+import org.main.booking.application.MaximizeBookingResponse;
 import org.main.booking.domain.Booking;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-
+@RestController
+@RequestMapping("/bookings")
 public class BookingController {
     private final BookingService bookingService;
 
@@ -25,8 +26,16 @@ public class BookingController {
 
     @PostMapping("/maximize")
     public ResponseEntity<MaximizeBookingResponse> maximizeProfits(@RequestBody List<Booking> bookingRequests) {
-        MaximizeBookingResponse maximizeBookingResponse = bookingService.maximizeProfits(bookingRequests);
-        return ResponseEntity.ok(maximizeBookingResponse);
+        MaximizeBookingResponse maximizeResponse = bookingService.maximizeProfits(bookingRequests);
+        return ResponseEntity.ok(maximizeResponse);
+    }
+
+    @PostMapping("/bookings")
+    public ResponseEntity<Void> handleBookingRequest(@RequestBody List<Booking> bookingRequests) {
+        for (Booking booking : bookingRequests) {
+            bookingService.saveBooking(booking);
+        }
+        return ResponseEntity.ok().build();
     }
 
     @GetMapping
@@ -34,7 +43,6 @@ public class BookingController {
         List<Booking> allBookings = bookingService.getAllBookings();
         return ResponseEntity.ok(allBookings);
     }
-
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<String> handleException(Exception e) {
