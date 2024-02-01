@@ -1,5 +1,7 @@
 package org.main.booking.adapter;
 
+import org.main.booking.adapter.dto.BookingStatsResponseDTO;
+import org.main.booking.adapter.dto.MaximizeBookingResponseDTO;
 import org.main.booking.application.BookingService;
 import org.main.booking.application.BookingStatsResponse;
 import org.main.booking.application.MaximizeBookingResponse;
@@ -22,23 +24,27 @@ public class BookingController {
     }
 
     @PostMapping("/stats")
-    public ResponseEntity<BookingStatsResponse> calculateBookingStats(@RequestBody List<Booking> bookingRequests) {
+    public ResponseEntity<BookingStatsResponseDTO> calculateBookingStats(@RequestBody List<Booking> bookingRequests) {
         BookingStatsResponse statsResponse = bookingService.calculateBookingStats(bookingRequests);
-        return ResponseEntity.ok(statsResponse);
+        BookingStatsResponseDTO statsResponseDTO = new BookingStatsResponseDTO(statsResponse);
+        return ResponseEntity.ok(statsResponseDTO);
     }
 
+
     @PostMapping("/maximize")
-    public ResponseEntity<MaximizeBookingResponse> maximizeProfits(@RequestBody List<Booking> bookingRequests) {
+    public ResponseEntity<MaximizeBookingResponseDTO> maximizeProfits(@RequestBody List<Booking> bookingRequests) {
         MaximizeBookingResponse maximizeResponse = bookingService.maximizeProfits(bookingRequests);
-        return ResponseEntity.ok(maximizeResponse);
+        MaximizeBookingResponseDTO maximizeResponseDTO = new MaximizeBookingResponseDTO(maximizeResponse);
+        return ResponseEntity.ok(maximizeResponseDTO);
     }
 
     @PostMapping("/bookings")
-    public ResponseEntity<Void> handleBookingRequest(@RequestBody List<Booking> bookingRequests) {
+    public ResponseEntity<List<Booking>> handleBookingRequest(@RequestBody List<Booking> bookingRequests) {
         for (Booking booking : bookingRequests) {
             bookingService.saveBooking(booking);
         }
-        return ResponseEntity.ok().build();
+        List<Booking> savedBookings = bookingService.getAllBookings();
+        return ResponseEntity.ok(savedBookings);
     }
 
     @GetMapping

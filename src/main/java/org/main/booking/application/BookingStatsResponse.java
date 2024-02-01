@@ -1,10 +1,12 @@
 package org.main.booking.application;
 
+import lombok.Getter;
 import org.main.booking.domain.Booking;
 
 import java.math.BigDecimal;
 import java.util.List;
 
+@Getter
 public class BookingStatsResponse {
     private BigDecimal avgNight;
     private BigDecimal minNight;
@@ -20,38 +22,4 @@ public class BookingStatsResponse {
         return new BookingStatsResponse(BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO);
     }
 
-    public BigDecimal getAvgNight() {
-        return avgNight;
-    }
-
-    public BigDecimal getMinNight() {
-        return minNight;
-    }
-
-    public BigDecimal getMaxNight() {
-        return maxNight;
-    }
-
-    public BigDecimal getMaxProfit() {
-        return BigDecimal.ZERO;
-    }
-
-    public BigDecimal getMinProfit() {
-        return BigDecimal.ZERO;
-    }
-
-    public BigDecimal getAverageProfit() {
-        return BigDecimal.ZERO;
-    }
-
-    private BigDecimal calculateProfit(Booking booking) {
-        return booking.getSellingRate().multiply(BigDecimal.valueOf(booking.getMargin()))
-                .divide(BigDecimal.valueOf(booking.getNights()), 2, BigDecimal.ROUND_HALF_UP);
-    }
-
-    private BigDecimal calculateTotalProfit(List<Booking> bookings) {
-        return bookings.stream()
-                .map(this::calculateProfit)
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
-    }
 }

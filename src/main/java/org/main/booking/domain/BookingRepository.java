@@ -20,7 +20,9 @@ public class BookingRepository {
     }
 
     private boolean hasOverlap(Booking newBooking) {
-        return bookings.stream().anyMatch(existingBooking -> checkOverlap(existingBooking, newBooking));
+        return bookings.stream()
+                .anyMatch(existingBooking -> checkOverlap(existingBooking, newBooking)
+                );
     }
 
     private boolean checkOverlap(Booking booking1, Booking booking2) {

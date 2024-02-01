@@ -2,6 +2,7 @@ package org.main.booking.adapter;
 
 import org.main.booking.domain.Booking;
 import org.main.booking.domain.BookingRepository;
+import org.main.booking.exceptions.OverlappingBookingException;
 import org.testng.annotations.Test;
 
 import java.math.BigDecimal;
@@ -29,7 +30,7 @@ public class BookingRepositoryTest {
 
         bookingRepository.save(booking1);
 
-        assertThrows(IllegalArgumentException.class, () -> bookingRepository.save(booking2));
+        assertThrows(OverlappingBookingException.class, () -> bookingRepository.save(booking2));
     }
 
     private Booking createBooking(String checkInDate, int nights) {
