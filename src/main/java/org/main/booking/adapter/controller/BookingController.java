@@ -1,4 +1,4 @@
-package org.main.booking.adapter;
+package org.main.booking.adapter.controller;
 
 import org.main.booking.adapter.dto.BookingStatsResponseDTO;
 import org.main.booking.adapter.dto.MaximizeBookingResponseDTO;

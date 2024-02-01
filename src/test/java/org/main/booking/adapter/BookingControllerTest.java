@@ -2,6 +2,7 @@ package org.main.booking.adapter;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.main.booking.adapter.controller.BookingController;
 import org.main.booking.application.BookingService;
 import org.main.booking.domain.Booking;
 import org.springframework.http.HttpStatus;
