@@ -53,9 +53,86 @@ The development of this project follows the following methodologies:
 
 The application will be available at [http://localhost:8080](http://localhost:8080).
 
+
+# API Documentation
+
+## Swagger UI
+The Swagger UI is available at [http://localhost:8080/swagger-ui.html](http://localhost:8080/swagger-ui.html). You can use this interface to visualize and interact with the API endpoints.
+
+## Swagger JSON
+The Swagger JSON file, which describes the API, can be found at [http://localhost:8080/v2/api-docs](http://localhost:8080/v2/api-docs).
+
+## Reservation Endpoints
+
+### Calculate Booking Stats
+- **Endpoint:** `POST /stats`
+- This endpoint calculates and returns the average, minimum, and maximum profit per night based on the provided booking requests.
+
+**Example Request:**
+```json
+[
+  {
+    "request_id": "booking_request_1",
+    "check_in": "2022-03-01",
+    "nights": 3,
+    "selling_rate": 150,
+    "margin": 15
+  },
+  {
+    "request_id": "booking_request_2",
+    "check_in": "2022-03-05",
+    "nights": 2,
+    "selling_rate": 120,
+    "margin": 10
+  }
+] 
+```
+### Example Response:
+
+```json
+{
+  "avg_night": 12.67,
+  "min_night": 10.5,
+  "max_night": 15
+}
+```
+## Maximize Profits
+- **Endpoint:** `POST /maximize`
+- This endpoint identifies the best combination of booking requests to maximize total profits.
+
+**Example Request:**
+```json
+[
+  {
+    "request_id": "booking_request_1",
+    "check_in": "2022-03-01",
+    "nights": 3,
+    "selling_rate": 150,
+    "margin": 15
+  },
+  {
+    "request_id": "booking_request_2",
+    "check_in": "2022-03-05",
+    "nights": 2,
+    "selling_rate": 120,
+    "margin": 10
+  }
+]
+```
+### Example Response:
+
+```json
+{
+  "request_ids": ["booking_request_1", "booking_request_2"],
+  "total_profit": 78,
+  "avg_night": 13,
+  "min_night": 12,
+  "max_night": 15
+}
+```
 ## How to Run Tests
 
 To run tests, use the following command:
 
 ```bash
-./mvnw test
+./mvnw test 
