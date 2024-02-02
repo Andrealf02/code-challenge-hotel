@@ -135,4 +135,4 @@ The Swagger JSON file, which describes the API, can be found at [http://localhos
 To run tests, use the following command:
 
 ```bash
-./mvnw test 
+./mvn test 
